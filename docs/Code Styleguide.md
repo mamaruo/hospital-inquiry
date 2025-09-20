@@ -1,6 +1,5 @@
 # 在线问诊项目代码规范
 
-
 # I. 核心原则
 
 *   **清晰性**：代码首先是写给人看的，其次才是给机器执行的。
@@ -9,7 +8,7 @@
 
 # II. Java (后端) 规范
 
-**基础**：以 **《阿里巴巴Java开发手册》** 为总纲。这里只强调项目中最常用到的几点。
+**基础**：以 [阿里巴巴Java开发手册](https://github.com/alibaba/p3c) 为总纲。
 
 **1. 命名规范**
 *   **包名**：全部小写，点分隔。格式：`com.公司域.项目名.模块名`。
@@ -23,7 +22,7 @@
 *   **领域模型后缀**：
     *   **Controller** 方法接收的请求数据：`...Request` 或 `...DTO` (Data Transfer Object)。
     *   **Service** 返回给 Controller 的数据：`...VO` (View Object)。
-    *   **数据库实体**：`...DO` (Data Object) 或直接用实体名，如 `User`, `Message`。
+    *   **数据库实体**：`...DO` (Data Object)。
 
 **2. Controller/Service/Repository(DAO) 层职责**
 *   **Controller 层**：
@@ -50,9 +49,9 @@
 
 ## III. Vue (前端) 规范
 
-**基础**：遵循 **Vue 官方风格指南 (A类和B类规则必须遵守)**。
+**基础**：遵循 [Vue 官方风格指南](https://vuejs.org/style-guide/) (A类和B类规则必须遵守)。
 
-**1. 命名规范**
+### 命名规范
 *   **组件文件名**：大驼峰 (PascalCase)。必须是多个单词。
     *   **正确**：`ConsultationWindow.vue`, `MessageItem.vue`
     *   **错误**：`Chat.vue` (应为 `ChatRoom.vue` 或其他)
@@ -61,8 +60,9 @@
     *   Template: `<MessageItem :consultation-id="currentId" />`
 *   **事件**：同 Props，JS 中 `this.$emit('sendMessage')`，模板中 `@send-message="handleMessage"`。
 
-**2. 文件结构**
-推荐按功能模块组织文件，而不是按文件类型。
+### 文件结构
+
+按功能模块组织文件，而不是按文件类型。
 ```
 src/
 ├── api/              # API 请求模块
@@ -80,7 +80,7 @@ src/
 └── ...
 ```
 
-**3. API 管理**
+### API 管理
 *   所有后端 API 请求必须统一封装在 `/src/api` 目录下，按模块划分。
 *   组件内不应直接出现 `axios.get('/api/...')` 这样的硬编码。
 *   示例 (`/src/api/consultation.js`):
@@ -97,22 +97,25 @@ src/
 
 ## IV. Git 提交规范
 
-使用 **Conventional Commits** 规范，这对于生成变更日志和快速定位代码变更非常有用。
+使用 **Conventional Commits** 规范，并在每条提交信息开头强制包含对应类型的 Emoji。这有助于生成变更日志和快速定位代码变更。
 
-**格式**: `type(scope): subject`
+**格式**: `<emoji><类型>(<作用域>): <提交描述>`
 
-*   **type**:
-    *   `feat`: 新功能
-    *   `fix`: 修复 bug
-    *   `docs`: 只修改了文档
-    *   `style`: 代码格式修改（不影响逻辑）
-    *   `refactor`: 代码重构
-    *   `test`: 添加或修改测试
-    *   `chore`: 构建过程或辅助工具的变动
-*   **scope**: (可选) 本次提交影响的范围，如 `chat`, `auth`, `user`
-*   **subject**: 简短的提交描述
+*   **类型与 Emoji 映射**：
+    *   feat → ✨
+    *   fix → 🐛
+    *   docs → 📚
+    *   style → 🎨
+    *   refactor → 🔨
+    *   perf → ⚡
+    *   test → 🚨
+    *   build → 📦
+    *   ci → 👷
+    *   chore → 🔧
+* **作用域**: (可选) 本次提交影响的范围，如 `chat`, `auth`, `user`
+* **提交描述**: 简短、明确、使用祈使句、首字母小写、结尾不加句号，内容为中文
 
 **示例**:
-*   `feat(chat): implement real-time messaging with WebSocket`
-*   `fix(auth): resolve token expiration issue on page refresh`
-*   `docs(readme): update project setup instructions`
+*   `✨feat(chat): 实现实时消息推送功能`
+*   `🐛fix(auth): 修复页面刷新后 token 失效问题`
+*   `📚docs(readme): 更新项目启动说明`
