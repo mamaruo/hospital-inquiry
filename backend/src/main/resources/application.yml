@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: hospitalinquiry
+  datasource:
+    url: jdbc:mariadb://localhost:3306/hospital_inquiry?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true
+    username: root
+    password:
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties: 
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+  security:
+    user:
+      name: admin
+      password: admin9
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+server:
+  servlet:
+    context-path: /hi
+  port: 8081

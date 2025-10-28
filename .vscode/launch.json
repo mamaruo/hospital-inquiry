@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-HospitalinquiryApplication<hospitalinquiry>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.mamaruo.hospitalinquiry.HospitalinquiryApplication",
+            "projectName": "hospitalinquiry",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
