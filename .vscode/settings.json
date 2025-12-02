@@ -18,5 +18,6 @@
             "password": ""
         }
     ],
-    "java.dependency.packagePresentation": "hierarchical"
+    "java.dependency.packagePresentation": "hierarchical",
+    "maven.view": "hierarchical"
 }
