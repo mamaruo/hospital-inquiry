@@ -1,5 +1,6 @@
 package com.mamaruo.hospitalinquiry.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +20,11 @@ public class User {
     private String mobile;
     @NotBlank
     private String password;
+    // @Column(nullable = false)
+    // @NotBlank
     private String name;
+    @Column(unique = true, length = 18)
+    // @NotBlank
     private String idCard;
 
     public String getName() {
