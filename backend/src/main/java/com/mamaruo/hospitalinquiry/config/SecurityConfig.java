@@ -23,8 +23,9 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    /** 配置并返回BCrypt密码编码器Bean，用于对用户密码进行加密与验证 */
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -33,12 +34,11 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/register").permitAll()
                 .anyRequest().authenticated()
             )
-            // .formLogin(Customizer.withDefaults())
             .httpBasic(Customizer.withDefaults())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            ;
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         
         return http.build();
     }

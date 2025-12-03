@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "shadcn-vue": {
+      "command": "npx",
+      "args": [
+        "shadcn-vue@latest",
+        "mcp"
+      ]
+    }
+  },
+  "inputs": []
+}
+  

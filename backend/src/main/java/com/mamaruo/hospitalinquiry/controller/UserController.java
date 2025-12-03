@@ -8,16 +8,16 @@ import com.mamaruo.hospitalinquiry.entity.User;
 import com.mamaruo.hospitalinquiry.service.UserService;
 
 
-@RestController
-public class UserController {
-    private final UserService userService;
+    @RestController
+    public class UserController {
+        private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+        public UserController(UserService userService) {
+            this.userService = userService;
+        }
 
-    @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        return userService.register(user);
+        @PostMapping("/signup")
+        public User signup(@RequestBody User user) {
+            return userService.signup(user);
+        }
     }
-}
