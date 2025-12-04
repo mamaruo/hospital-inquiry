@@ -16,7 +16,12 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@tabler/icons-vue": "^3.35.0",
     "@tailwindcss/vite": "^4.1.17",
+    "@tanstack/vue-table": "^8.21.3",
+    "@unovis/ts": "^1.6.2",
+    "@unovis/vue": "^1.6.2",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.1.0",
     "class-variance-authority": "^0.7.1",
