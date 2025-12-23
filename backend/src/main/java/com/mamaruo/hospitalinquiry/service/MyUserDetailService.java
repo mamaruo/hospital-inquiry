@@ -20,10 +20,8 @@ public class MyUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByMobile(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        User user = userRepository.findByMobile(username)
+            .orElseThrow(() -> new UsernameNotFoundException("用户不存在"));
 
         return new UserPrincipal(user);
     }

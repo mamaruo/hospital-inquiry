@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mamaruo.hospitalinquiry.entity.User;
 import com.mamaruo.hospitalinquiry.entity.dto.LoginRequest;
+import com.mamaruo.hospitalinquiry.entity.dto.LoginResponse;
+import com.mamaruo.hospitalinquiry.entity.dto.UserResponse;
 import com.mamaruo.hospitalinquiry.service.UserService;
 
 
@@ -18,12 +20,12 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public User signup(@RequestBody User user) {
+    public UserResponse signup(@RequestBody User user) {
         return userService.signup(user);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@RequestBody LoginRequest request) {
         return userService.verify(request);
     }
 }

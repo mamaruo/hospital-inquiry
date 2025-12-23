@@ -7,6 +7,8 @@ import {
   LogOut,
   Sparkles,
 } from "lucide-vue-next"
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 import {
   Avatar,
@@ -39,6 +41,13 @@ const props = defineProps<{
 }>()
 
 const { isMobile } = useSidebar()
+const router = useRouter()
+const authStore = useAuthStore()
+
+function handleLogout() {
+  authStore.logout()
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -106,7 +115,7 @@ const { isMobile } = useSidebar()
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem @click="handleLogout">
             <LogOut />
             Log out
           </DropdownMenuItem>

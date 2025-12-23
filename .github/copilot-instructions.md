@@ -11,7 +11,16 @@ Shadcn-vue: /websites/shadcn-vue
 
 # Shadcn-vue
 
-Field 已取代 From 用于表单，若你不知道怎么用，查 context7。
+若你不知道怎么用，查 context7 ID: /websites/shadcn-vue
+要安装新的组件，需先 cd frontend\hospital-inquiry 再运行 npx 命令。
+可在 src\components\ui 中查看已安装组件。
+导入可用别名 @/components/ui/
+Field 已取代 From 用于表单。
+Sonner 已取代 Toast 用于消息提示。
+
+# Springboot 情况
+
+请求应发往 http://localhost:8081/hi/，hi 是 context-path。
 
 # 技术栈
 

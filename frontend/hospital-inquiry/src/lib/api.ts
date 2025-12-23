@@ -16,16 +16,28 @@ export type UserResponse = {
   id: number
   name: string
   mobile: string
-  id_card: string
+  idCard: string
+}
+
+export type LoginResponse = {
+  token: string
+  user: UserResponse
+}
+
+export type ErrorResponse = {
+  timestamp: string
+  status: number
+  error: string
+  message: string
+  path: string
 }
 
 async function buildError(response: Response) {
   const contentType = response.headers.get('content-type') ?? ''
   if (contentType.includes('application/json')) {
     try {
-      const data = await response.json()
-      const message = typeof data === 'string' ? data : data.message || JSON.stringify(data)
-      return message
+      const data = await response.json() as ErrorResponse
+      return data.message || data.error || JSON.stringify(data)
     } catch {
       /* fall through */
     }
@@ -56,7 +68,7 @@ async function post<T>(path: string, body: unknown, expectJson = true): Promise<
 }
 
 export function login(payload: LoginPayload) {
-  return post<string>('/login', payload, false)
+  return post<LoginResponse>('/login', payload, true)
 }
 
 export function signup(payload: SignupPayload) {

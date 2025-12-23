@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { LoginPayload, SignupPayload, UserResponse } from '@/lib/api'
+import type { LoginPayload, SignupPayload, UserResponse, LoginResponse } from '@/lib/api'
 import { login as loginRequest, signup as signupRequest } from '@/lib/api'
 
 const TOKEN_STORAGE_KEY = 'hospital-inquiry.token'
@@ -35,9 +35,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function login(payload: LoginPayload) {
-    const authToken = await loginRequest(payload)
-    setToken(authToken)
-    return authToken
+    const response = await loginRequest(payload)
+    setToken(response.token)
+    user.value = response.user
+    return response
   }
 
   async function signup(payload: SignupPayload) {
