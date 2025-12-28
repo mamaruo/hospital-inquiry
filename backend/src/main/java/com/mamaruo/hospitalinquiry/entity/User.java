@@ -2,6 +2,8 @@ package com.mamaruo.hospitalinquiry.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +28,13 @@ public class User {
     @Column(unique = true, length = 18)
     // @NotBlank
     private String idCard;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.PATIENT;  // 默认为患者
+    
+    @Column(nullable = false)
+    private Boolean enabled = true;  // 账号是否启用
 
     public String getName() {
         return name;
@@ -65,5 +74,21 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

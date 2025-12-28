@@ -15,9 +15,21 @@ public class UserPrincipal implements UserDetails{
         this.user = user;
     }
 
+    public Integer getId() {
+        return user.getId();
+    }
+
+    public Role getRole() {
+        return user.getRole();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("USER"));
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override
@@ -29,5 +41,9 @@ public class UserPrincipal implements UserDetails{
     public String getUsername() {
         return user.getMobile();
     }
-    
+
+    @Override
+    public boolean isEnabled() {
+        return user.getEnabled();
+    }
 }

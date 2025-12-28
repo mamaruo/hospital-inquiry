@@ -50,7 +50,7 @@ const handleSubmit = async () => {
       password: password.value,
     })
 
-    router.push({ name: 'name' })
+    router.push({ path: '/' })
   } catch (error) {
     const message = error instanceof Error ? error.message : '注册失败，请重试'
     errorMessage.value = message

@@ -49,6 +49,10 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/signup", "/login").permitAll()
+                .requestMatchers("/ws/**").permitAll()  // WebSocket 端点
+                .requestMatchers("/api/files/**").permitAll()  // 文件访问
+                .requestMatchers("/api/departments").permitAll()  // 公开科室列表
+                .requestMatchers("/api/doctors/public/**").permitAll()  // 公开医生信息
                 .requestMatchers("swagger-ui/**", "v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
             )

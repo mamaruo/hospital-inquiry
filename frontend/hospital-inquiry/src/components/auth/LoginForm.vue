@@ -44,7 +44,8 @@ const handleSubmit = async () => {
       mobile: mobile.value,
       password: password.value,
     })
-    router.push({ path: '/visitor' })
+    // 登录成功后跳转到首页，路由会根据角色自动重定向
+    router.push({ path: '/' })
   } catch (error) {
     const message = error instanceof Error ? error.message : '登录失败，请重试'
     errorMessage.value = message

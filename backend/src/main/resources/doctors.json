@@ -1,0 +1,170 @@
+[
+  {
+    "name": "杨正林",
+    "department": "临床医学检验中心",
+    "title": "研究员",
+    "expertise": "临床检验诊断学、疾病基因研究",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\154524573_85_116_0.jpg"
+  },
+  {
+    "name": "曾俊",
+    "department": "急诊医学科",
+    "title": "主任医师",
+    "expertise": "长期从事普外科、急诊外科、创伤外科专业领域疾病的诊治，对甲状腺肿瘤、胃肠肿瘤、腹壁疝、外科急腹症、多发伤一体化救治及外科危重症有丰富的临床经验",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\143448541_85_116_0.jpg"
+  },
+  {
+    "name": "辜玉刚",
+    "department": "内科",
+    "title": "主任医师",
+    "expertise": "普外胃肠疾病、外科急腹症、炎性或肿瘤性肠梗阻、重症急性胰腺炎及严重多发伤的诊治。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\143643273_85_116_0.jpg"
+  },
+  {
+    "name": "黄晓波",
+    "department": "内科",
+    "title": "主任医师",
+    "expertise": "诊治各种急危重症疾病，尤其擅长血流动力学监测及循环功能支持，急性呼吸窘迫综合症、严重脓毒症、重症急性胰腺炎、心肺复苏后生命支持等各种危急重症诊治及冠脉搭桥、肝肾移植、复杂先心、小儿外科等围术期管理，脑死亡鉴定及器官供体保护等。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\161826871_85_116_0.jpg"
+  },
+  {
+    "name": "石毅",
+    "department": "五官科",
+    "title": "研究员",
+    "expertise": "眼科疾病基因基础和临床应用研究。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\141238320_85_116_0.jpg"
+  },
+  {
+    "name": "王莉",
+    "department": "肾内科",
+    "title": "主任医师",
+    "expertise": "擅长肾小球疾病诊治，慢性肾脏病防治，肾脏病危重症抢救和各种血液净化技术。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\112730723_85_116_0.jpg"
+  },
+  {
+    "name": "李贵森",
+    "department": "肾内科",
+    "title": "主任医师",
+    "expertise": "原发性肾小球疾病（IgA肾病，膜性肾病等）、继发性肾小球病（狼疮性肾炎，糖尿病肾病等）、难治性肾病综合征、急慢性肾功能衰竭、遗传性肾病等疑难肾脏疾病",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\153458223_85_116_0.jpg"
+  },
+  {
+    "name": "吴波",
+    "department": "神经外科",
+    "title": "主任医师",
+    "expertise": "擅长听神经瘤、脑干肿瘤、岩斜区-枕骨大孔区脑膜瘤、颅底复杂脑膜瘤、颈静脉孔区肿瘤及小脑扁桃体下疝畸形等神经外科疾病。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\154442814_85_116_0.jpg"
+  },
+  {
+    "name": "胡豇",
+    "department": "骨科",
+    "title": "主任医师",
+    "expertise": "各类脊柱相关疾病的诊 治，包括颈椎病、腰椎间盘突出症、椎管狭窄症等疾病的微创治疗。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\170354804_85_116_0.jpg"
+  },
+  {
+    "name": "贺平",
+    "department": "中医科",
+    "title": "主任医师",
+    "expertise": "擅长运用中医中西医结合方法治疗各种大肠肛门及盆底疾病如混合、痔肛周脓肿、肛瘘、脱肛便秘、慢性结肠炎骶前囊肿、直肠息肉、先天后天肛门会阴畸形、缺损等疾病，且擅长运用先进微创技术如TST、PPH、TST-Starr、RPH等治疗难治性痔、直肠脱垂，以及应用中医药治疗顽固性便秘及溃疡性结肠炎。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\105922579_85_116_0.jpg"
+  },
+  {
+    "name": "陈隆益",
+    "department": "神经外科",
+    "title": "主任医师",
+    "expertise": "擅长脑外伤、垂体瘤 、神经脊柱脊髓疾病，在神经内镜和显微神经外科手术方面有很高的造诣。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\153526121_85_116_0.jpg"
+  },
+  {
+    "name": "何强",
+    "department": "肾内科",
+    "title": "主任医师",
+    "expertise": "擅    长：肾脏病内科，原发和继发肾小球疾病、肾间质疾病、急慢性肾功能衰竭、血液透析、透析血管通路等。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\170925410_85_116_0.jpg"
+  },
+  {
+    "name": "王跃",
+    "department": "骨科",
+    "title": "主任医师",
+    "expertise": "擅长髋、膝关节置换手术；股骨头坏死，髋、膝关节疾病，类风湿关节炎，关节畸形、僵硬等疾病的诊治，在关节置换的再次翻修手术上更有独到之处。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\153427843_85_116_0.jpg"
+  },
+  {
+    "name": "陈立华",
+    "department": "神经外科",
+    "title": "主任医师",
+    "expertise": "脑肿瘤微创显微手术，小儿脑肿瘤、3D颅骨缺损修复、小儿脑瘫和先天畸形手术在国内处于领先水平。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\165301637_85_116_0.jpg"
+  },
+  {
+    "name": "曲滨",
+    "department": "烧伤与创面修复外科",
+    "title": "主任医师",
+    "expertise": "擅长：重度、特重度烧伤、电烧伤救治、各种急、慢性创面修复、疤痕防治及整复、体表肿瘤诊治等。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\161506797_85_116_0.jpg"
+  },
+  {
+    "name": "俞小炯",
+    "department": "肝胆胰外科",
+    "title": "主任医师",
+    "expertise": "擅长肝胆胰外科疑难病的诊治及手术，如半肝出入阻断、肝癌切除术、胰十二指肠切除术、肝门胆管癌根治术等。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\111927451_85_116_0.jpg"
+  },
+  {
+    "name": "王东",
+    "department": "机器人微创中心",
+    "title": "主任医师",
+    "expertise": "da Vinci 机器人及腹腔镜技术：保留性功能的前列腺癌根治（单孔）、膀胱癌根治+回肠原位新膀胱、肾/肾盂癌根治、肾部份切除、肾上腺（肿瘤）切除、积水/萎缩/结核肾切除、肾盂输尿管成型、重复肾切除、肾下垂固定、马蹄肾离断等；压力性尿失禁及女性盆底（膀胱）脱垂微创治疗。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\084458938_85_116_0.jpg"
+  },
+  {
+    "name": "万仑",
+    "department": "骨科",
+    "title": "主任医师",
+    "expertise": "开展了大量的脊柱外科手术，（包括：颈椎、胸椎、腰椎、骶尾椎）如脊柱骨折、脱位伴瘫痪的切开复位内固定术，脊柱结核、肿瘤切除及内固定术，脊柱侧弯、脊柱先天畸形矫正术，颈、胸、腰椎间盘突出及退变的治疗。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\170833967_85_116_0.jpg"
+  },
+  {
+    "name": "张兵",
+    "department": "烧伤与创面修复外科",
+    "title": "主任医师",
+    "expertise": "擅长小儿烧伤、特重烧伤、电损伤治疗及难愈性创面修复。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\153557871_85_116_0.jpg"
+  },
+  {
+    "name": "朱建辛",
+    "department": "骨科",
+    "title": "主任医师",
+    "expertise": "骨科各种关节疾患治疗。髋、膝关节的老年性疾病以及骨肿瘤的诊治经验丰富，特别是股骨头坏死、髋关节发育不良、关节畸形的矫形治疗。在关节置换术后的骨折、感染及翻修的治疗方面更有独到之处。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\164850963_85_116_0.jpg"
+  },
+  {
+    "name": "唐六一",
+    "department": "骨科",
+    "title": "主任医师",
+    "expertise": "脊柱外科。腰椎疾病（腰椎间盘突出症、腰椎管狭窄症、腰椎滑脱、腰椎侧凸等）的微创和开放手术治疗；颈椎病手术治疗；脊柱侧凸手术治疗；脊柱结核和脊柱肿瘤手术治疗等。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\171119139_85_116_0.jpg"
+  },
+  {
+    "name": "魏丹",
+    "department": "骨科",
+    "title": "主任医师",
+    "expertise": "各类复杂四肢和关节内骨折、骨盆髋臼骨折、老年骨质疏松骨折、骨折术后畸形、骨折术后不愈合和急慢性骨髓炎等的诊断和手术治疗。擅长骨科机器人辅助下微创治疗各类骨折。对拇外翻、保膝、保髋等各种畸形矫正具有丰富经验。对骨质疏松类疾患有较深入研究。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\171228464_85_116_0.jpg"
+  },
+  {
+    "name": "庞健",
+    "department": "骨科",
+    "title": "主任医师",
+    "expertise": "擅长 骨科各种常见多发病，疑难重症，尤其是髋、膝关节退行性疾病以及脊柱退行性疾病的诊断和治疗。对于关节炎，骨病 ， 骨肿瘤，骨关节创伤畸形，老年性骨骨骼肌肉疼痛及骨质疏松有颇深的造诣。并具有临床法医资格，可作伤残等级程度鉴定，损伤程度鉴定，医疗损害鉴定。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\171444203_85_116_0.jpg"
+  },
+  {
+    "name": "卢冰",
+    "department": "骨科",
+    "title": "主任医师",
+    "expertise": "诊治范围包括肩、肘复杂创伤骨折，肩、肘关节退变骨关节炎的关节置换，以及关节镜治疗肩痛、肩峰撞击、肩袖损伤、肩关节不稳等肩部疾病。",
+    "photo_path": "C:\\Users\\mamaruo\\Documents\\Python\\doctor\\avatars\\171600349_85_116_0.jpg"
+  }
+]
