@@ -29,12 +29,33 @@ const confirmPassword = ref('')
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 
+const mobilePattern = /^1\d{10}$/
+
+const validate = (): string | null => {
+  if (confirmPassword.value !== password.value) {
+    return '两次输入的密码不一致'
+  }
+  if (password.value.length < 8) {
+    return '密码长度至少为8个字符'
+  }
+  if (!mobilePattern.test(mobile.value)) {
+    return '请输入正确的手机号'
+  }
+  return null
+}
+
 const handleSubmit = async () => {
   if (isSubmitting.value) {
     return
   }
 
   errorMessage.value = ''
+  const validationError = validate()
+  if (validationError) {
+    errorMessage.value = validationError
+    return
+  }
+
   isSubmitting.value = true
 
   try {

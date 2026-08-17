@@ -85,12 +85,12 @@ const handleSubmit = async () => {
                 <FieldLabel for="password">
                   密码
                 </FieldLabel>
-                <a
-                  href="#"
+                <RouterLink
+                  to="/forgot-password"
                   class="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                 >
                   忘记密码？
-                </a>
+                </RouterLink>
               </div>
               <Input
                 id="password"

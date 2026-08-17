@@ -35,6 +35,11 @@ const router = createRouter({
       component: SignUpPage,
     },
     {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/views/auth/ForgotPassword.vue'),
+    },
+    {
       path: '/home',
       name: 'home',
       component: HomeView,
@@ -135,6 +140,13 @@ const router = createRouter({
           component: () => import('@/views/admin/DoctorManagement.vue'),
         },
       ],
+    },
+    // 个人中心（所有登录角色可用）
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/views/account/ProfileView.vue'),
+      meta: { requiresAuth: true },
     },
     // 兼容旧路由
     {

@@ -331,3 +331,23 @@ export function resetUserPassword(id: number, newPassword: string) {
 export function createAdmin(mobile: string, password: string, name: string) {
   return post<UserResponse>('/api/admin/create-admin', { mobile, password, name })
 }
+
+// 个人中心相关
+export function getCurrentUser() {
+  return get<UserResponse>('/api/users/me')
+}
+
+export function changePassword(oldPassword: string, newPassword: string) {
+  return put<void>('/api/users/me/password', {
+    old_password: oldPassword,
+    new_password: newPassword,
+  })
+}
+
+export function forgotPassword(mobile: string, idCard: string, newPassword: string) {
+  return post<void>('/api/users/forgot-password', {
+    mobile,
+    id_card: idCard,
+    new_password: newPassword,
+  }, false)
+}

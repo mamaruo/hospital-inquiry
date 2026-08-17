@@ -137,6 +137,10 @@ function navigateTo(url: string) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem @click="router.push('/profile')">
+                  <UserRound class="mr-2 h-4 w-4" />
+                  <span>个人中心</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem @click="handleLogout">
                   <LogOut class="mr-2 h-4 w-4" />
                   <span>退出登录</span>
