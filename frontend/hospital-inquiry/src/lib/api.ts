@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? 'http://localhost:8081/hi'
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? 'http://localhost:8081/hi'
 
 export type Role = 'PATIENT' | 'DOCTOR' | 'ADMIN'
 
@@ -128,6 +128,16 @@ function getToken(): string | null {
   return localStorage.getItem('hospital-inquiry.token')
 }
 
+// token 过期/无效：清除本地凭证并回登录页（认证接口自身除外，避免循环）
+function handleUnauthorized(path: string) {
+  if (path.startsWith('/login') || path.startsWith('/signup')) return
+  localStorage.removeItem('hospital-inquiry.token')
+  localStorage.removeItem('hospital-inquiry.user')
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login'
+  }
+}
+
 async function request<T>(
   method: string,
   path: string,
@@ -137,7 +147,7 @@ async function request<T>(
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   }
-  
+
   const token = getToken()
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
@@ -150,6 +160,9 @@ async function request<T>(
   })
 
   if (!response.ok) {
+    if (response.status === 401) {
+      handleUnauthorized(path)
+    }
     const message = await buildError(response)
     throw new Error(message)
   }
@@ -222,6 +235,30 @@ export function getAllDoctors() {
 
 export function getDoctorByUserId(userId: number) {
   return get<DoctorDto>(`/api/doctors/user/${userId}`)
+}
+
+export type CreateDoctorRequest = {
+  mobile: string
+  password: string
+  name: string
+  department_id: number
+  title: string
+  expertise: string
+}
+
+export type UpdateDoctorRequest = {
+  department_id: number
+  title: string
+  expertise: string
+  available: boolean
+}
+
+export function createDoctor(data: CreateDoctorRequest) {
+  return post<DoctorDto>('/api/doctors', data)
+}
+
+export function updateDoctor(id: number, data: UpdateDoctorRequest) {
+  return put<DoctorDto>(`/api/doctors/${id}`, data)
 }
 
 // 问诊人相关

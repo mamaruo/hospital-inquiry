@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { DateValue } from '@internationalized/date'
+import type { DateValue } from 'reka-ui'
 import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date'
 import { toDate } from 'reka-ui/date'
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, shallowRef, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   getDepartments, 
@@ -12,6 +12,7 @@ import {
   createPatientProfile
 } from '@/lib/api'
 import type { DepartmentDto, DoctorDto, PatientProfileDto } from '@/lib/api'
+import { toast } from 'vue-sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -60,7 +61,7 @@ const newProfile = ref({
 
 const birthDatePlaceholder = today(getLocalTimeZone())
 const dateFormatter = new DateFormatter('zh-CN', { dateStyle: 'medium' })
-const newProfileBirthDate = ref<DateValue | null>(null)
+const newProfileBirthDate = shallowRef<DateValue | undefined>(undefined)
 
 const selectedDepartment = computed(() => 
   departments.value.find(d => d.id === selectedDepartmentId.value)
@@ -132,9 +133,9 @@ async function createNewProfile() {
     selectedProfileId.value = created.id
     showNewProfileForm.value = false
     newProfile.value = { name: '', gender: '男', birth_date: null, medical_history: '' }
-    newProfileBirthDate.value = null
+    newProfileBirthDate.value = undefined
   } catch (error) {
-    alert(error instanceof Error ? error.message : '创建问诊人失败')
+    toast.error(error instanceof Error ? error.message : '创建问诊人失败')
   }
 }
 
@@ -149,7 +150,7 @@ async function handleSubmit() {
     })
     router.push(`/patient/chat/${inquiry.id}`)
   } catch (error) {
-    alert(error instanceof Error ? error.message : '创建问诊失败')
+    toast.error(error instanceof Error ? error.message : '创建问诊失败')
   }
 }
 
@@ -157,7 +158,7 @@ function goBack() {
   router.push('/patient')
 }
 
-function formatDateValue(value: DateValue | null) {
+function formatDateValue(value: DateValue | undefined) {
   if (!value) return null
   const date = toDate(value, getLocalTimeZone())
   const year = date.getFullYear()

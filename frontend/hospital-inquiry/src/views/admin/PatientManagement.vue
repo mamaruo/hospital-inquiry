@@ -2,10 +2,21 @@
 import { ref, computed, onMounted } from 'vue'
 import { getAllPatients, searchUsers, toggleUserStatus } from '@/lib/api'
 import type { UserResponse } from '@/lib/api'
+import { toast } from 'vue-sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Table,
   TableBody,
@@ -45,17 +56,30 @@ async function loadPatients() {
   }
 }
 
-async function handleToggleStatus(patient: UserResponse) {
-  const action = patient.enabled ? '禁用' : '启用'
-  if (!confirm(`确定要${action}该用户吗？`)) return
+const showToggleConfirm = ref(false)
+const toggleTarget = ref<UserResponse | null>(null)
+const toggleLoading = ref(false)
+
+function askToggleStatus(patient: UserResponse) {
+  toggleTarget.value = patient
+  showToggleConfirm.value = true
+}
+
+async function handleToggleStatus() {
+  if (!toggleTarget.value) return
   try {
-    const updated = await toggleUserStatus(patient.id)
-    const index = patients.value.findIndex((p) => p.id === patient.id)
+    toggleLoading.value = true
+    const updated = await toggleUserStatus(toggleTarget.value.id)
+    const index = patients.value.findIndex((p) => p.id === toggleTarget.value?.id)
     if (index !== -1) {
       patients.value[index] = updated
     }
+    toast.success(`已${toggleTarget.value.enabled ? '禁用' : '启用'} ${toggleTarget.value.name || '该患者'}`)
   } catch (error) {
-    alert(error instanceof Error ? error.message : '操作失败')
+    toast.error(error instanceof Error ? error.message : '操作失败')
+  } finally {
+    toggleLoading.value = false
+    showToggleConfirm.value = false
   }
 }
 </script>
@@ -112,7 +136,7 @@ async function handleToggleStatus(patient: UserResponse) {
                 <Button
                   :variant="patient.enabled ? 'outline' : 'default'"
                   size="sm"
-                  @click="handleToggleStatus(patient)"
+                  @click="askToggleStatus(patient)"
                 >
                   <Ban v-if="patient.enabled" class="mr-2 h-4 w-4" />
                   <CheckCircle v-else class="mr-2 h-4 w-4" />
@@ -124,5 +148,23 @@ async function handleToggleStatus(patient: UserResponse) {
         </Table>
       </CardContent>
     </Card>
+
+    <!-- 禁用/启用确认 -->
+    <AlertDialog v-model:open="showToggleConfirm">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            确定要{{ toggleTarget?.enabled ? '禁用' : '启用' }}该患者账号吗？
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {{ toggleTarget?.enabled ? '禁用后该患者将无法登录系统。' : '启用后该患者可正常登录。' }}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel :disabled="toggleLoading">取消</AlertDialogCancel>
+          <AlertDialogAction :disabled="toggleLoading" @click="handleToggleStatus">确定</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>

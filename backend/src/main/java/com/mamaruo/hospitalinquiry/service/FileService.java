@@ -1,6 +1,7 @@
 package com.mamaruo.hospitalinquiry.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,12 +9,15 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FileService {
-    
+
+    private static final String DEFAULT_AVATAR = "default.svg";
+
     @Value("${app.upload.dir:C:/hospital-uploads}")
     private String uploadDir;
 
@@ -47,15 +51,42 @@ public class FileService {
         return Files.readAllBytes(filePath);
     }
 
-    public byte[] getDoctorPhoto(String photoPath) throws IOException {
+    /**
+     * 医生头像及其实际生效的文件名（用于判定 Content-Type）。
+     */
+    public record DoctorPhoto(byte[] data, String filename) {}
+
+    public DoctorPhoto getDoctorPhoto(String photoPath) {
         if (photoPath == null || photoPath.isEmpty()) {
             throw new IllegalArgumentException("照片路径为空");
         }
         Path filePath = Paths.get(photoPath);
-        if (!Files.exists(filePath)) {
-            throw new IllegalArgumentException("照片不存在");
+        if (filePath.isAbsolute() && Files.exists(filePath)) {
+            try {
+                return new DoctorPhoto(Files.readAllBytes(filePath), filePath.getFileName().toString());
+            } catch (IOException e) {
+                throw new IllegalArgumentException("照片读取失败");
+            }
         }
-        return Files.readAllBytes(filePath);
+        // 相对文件名（或换机器后失效的绝对路径）从打包资源中按文件名解析
+        String filename = filePath.getFileName().toString();
+        byte[] bundled = readBundledAvatar(filename);
+        if (bundled != null) {
+            return new DoctorPhoto(bundled, filename);
+        }
+        byte[] fallback = readBundledAvatar(DEFAULT_AVATAR);
+        if (fallback != null) {
+            return new DoctorPhoto(fallback, DEFAULT_AVATAR);
+        }
+        throw new IllegalArgumentException("照片不存在");
+    }
+
+    private byte[] readBundledAvatar(String filename) {
+        try (InputStream in = new ClassPathResource("static/avatars/" + filename).getInputStream()) {
+            return in.readAllBytes();
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     public void deleteFile(String filename) throws IOException {

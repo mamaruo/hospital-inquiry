@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from '@/views/LoginPage.vue'
 import SignUpPage from '@/views/SignUpPage.vue'
-import HomeView from '@/views/HomeView.vue'
 import { useAuthStore } from '@/stores/auth'
 import { pinia } from '@/stores'
 
@@ -38,11 +37,6 @@ const router = createRouter({
       path: '/forgot-password',
       name: 'forgot-password',
       component: () => import('@/views/auth/ForgotPassword.vue'),
-    },
-    {
-      path: '/home',
-      name: 'home',
-      component: HomeView,
     },
     // 患者端路由
     {
@@ -156,13 +150,34 @@ const router = createRouter({
   ],
 })
 
+// 各角色登录后的首页
+function homeForRole(role: string | null | undefined) {
+  switch (role) {
+    case 'DOCTOR':
+      return '/doctor'
+    case 'ADMIN':
+      return '/admin'
+    default:
+      return '/patient'
+  }
+}
+
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore(pinia)
   const requiresAuth = to.matched.some((record) => record.meta?.requiresAuth)
+  const requiredRole = to.matched
+    .map((record) => record.meta?.role as string | undefined)
+    .find(Boolean)
   const isAuthRoute = to.name === 'login' || to.name === 'signup'
 
   if (requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login' })
+    return
+  }
+
+  // 角色不匹配时重定向到本人角色首页
+  if (requiresAuth && requiredRole && authStore.userRole !== requiredRole) {
+    next({ path: homeForRole(authStore.userRole) })
     return
   }
 

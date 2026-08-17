@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { DateValue } from '@internationalized/date'
+import type { DateValue } from 'reka-ui'
 import { DateFormatter, getLocalTimeZone, parseDate, today } from '@internationalized/date'
 import { toDate } from 'reka-ui/date'
-import { ref, onMounted } from 'vue'
+import { ref, shallowRef, onMounted } from 'vue'
 import { 
   getMyPatientProfiles, 
   createPatientProfile, 
@@ -10,9 +10,20 @@ import {
   deletePatientProfile 
 } from '@/lib/api'
 import type { PatientProfileDto } from '@/lib/api'
+import { toast } from 'vue-sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Popover,
   PopoverContent,
@@ -50,7 +61,7 @@ const form = ref({
   medical_history: '' as string,
 })
 
-const birthDate = ref<DateValue | null>(null)
+const birthDate = shallowRef<DateValue | undefined>(undefined)
 const birthDatePlaceholder = today(getLocalTimeZone())
 const dateFormatter = new DateFormatter('zh-CN', { dateStyle: 'medium' })
 
@@ -77,7 +88,7 @@ function openCreateForm() {
     birth_date: null,
     medical_history: '',
   }
-  birthDate.value = null
+  birthDate.value = undefined
   showForm.value = true
 }
 
@@ -89,7 +100,7 @@ function openEditForm(profile: PatientProfileDto) {
     birth_date: profile.birth_date,
     medical_history: profile.medical_history || '',
   }
-  birthDate.value = profile.birth_date ? parseDate(profile.birth_date) : null
+  birthDate.value = profile.birth_date ? parseDate(profile.birth_date) : undefined
   showForm.value = true
 }
 
@@ -103,25 +114,39 @@ async function handleSubmit() {
     }
     if (editingId.value) {
       await updatePatientProfile(editingId.value, submitData)
+      toast.success('问诊人信息已更新')
     } else {
       await createPatientProfile(submitData)
+      toast.success('问诊人已添加')
     }
     showForm.value = false
     await loadProfiles()
   } catch (error) {
-    console.error('保存失败:', error)
-    alert(error instanceof Error ? error.message : '保存失败')
+    toast.error(error instanceof Error ? error.message : '保存失败')
   }
 }
 
-async function handleDelete(id: number) {
-  if (!confirm('确定要删除该问诊人吗？')) return
+const showDeleteConfirm = ref(false)
+const deleteTarget = ref<PatientProfileDto | null>(null)
+const deleteLoading = ref(false)
+
+function askDelete(profile: PatientProfileDto) {
+  deleteTarget.value = profile
+  showDeleteConfirm.value = true
+}
+
+async function handleDelete() {
+  if (!deleteTarget.value) return
   try {
-    await deletePatientProfile(id)
+    deleteLoading.value = true
+    await deletePatientProfile(deleteTarget.value.id)
+    toast.success(`已删除问诊人「${deleteTarget.value.name}」`)
     await loadProfiles()
   } catch (error) {
-    console.error('删除失败:', error)
-    alert(error instanceof Error ? error.message : '删除失败')
+    toast.error(error instanceof Error ? error.message : '删除失败')
+  } finally {
+    deleteLoading.value = false
+    showDeleteConfirm.value = false
   }
 }
 
@@ -129,7 +154,7 @@ function cancelForm() {
   showForm.value = false
 }
 
-function formatDateValue(value: DateValue | null) {
+function formatDateValue(value: DateValue | undefined) {
   if (!value) return null
   const date = toDate(value, getLocalTimeZone())
   const year = date.getFullYear()
@@ -265,7 +290,7 @@ function formatDateDisplay(dateStr: string | null) {
                   <Button variant="ghost" size="icon" @click="openEditForm(profile)">
                     <Edit class="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" @click="handleDelete(profile.id)">
+                  <Button variant="ghost" size="icon" @click="askDelete(profile)">
                     <Trash2 class="h-4 w-4" />
                   </Button>
                 </div>
@@ -275,5 +300,21 @@ function formatDateDisplay(dateStr: string | null) {
         </Table>
       </CardContent>
     </Card>
+
+    <!-- 删除确认 -->
+    <AlertDialog v-model:open="showDeleteConfirm">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>确定要删除该问诊人吗？</AlertDialogTitle>
+          <AlertDialogDescription>
+            将删除问诊人「{{ deleteTarget?.name }}」的信息，该操作不可恢复。
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel :disabled="deleteLoading">取消</AlertDialogCancel>
+          <AlertDialogAction :disabled="deleteLoading" @click="handleDelete">删除</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>

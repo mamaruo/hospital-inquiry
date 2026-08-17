@@ -2,11 +2,22 @@
 import { ref, onMounted } from 'vue'
 import { getDepartments, createDepartment, updateDepartment, deleteDepartment } from '@/lib/api'
 import type { DepartmentDto } from '@/lib/api'
+import { toast } from 'vue-sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Table,
   TableBody,
@@ -58,26 +69,46 @@ function openEditForm(dept: DepartmentDto) {
 }
 
 async function handleSubmit() {
+  if (!form.value.name.trim()) {
+    toast.error('请输入科室名称')
+    return
+  }
   try {
     if (editingId.value) {
-      await updateDepartment(editingId.value, form.value.name, form.value.description || null)
+      await updateDepartment(editingId.value, form.value.name.trim(), form.value.description || null)
+      toast.success('科室已更新')
     } else {
-      await createDepartment(form.value.name, form.value.description || null)
+      await createDepartment(form.value.name.trim(), form.value.description || null)
+      toast.success('科室已创建')
     }
     showForm.value = false
     await loadDepartments()
   } catch (error) {
-    alert(error instanceof Error ? error.message : '保存失败')
+    toast.error(error instanceof Error ? error.message : '保存失败')
   }
 }
 
-async function handleDelete(id: number) {
-  if (!confirm('确定要删除该科室吗？')) return
+const showDeleteConfirm = ref(false)
+const deleteTarget = ref<DepartmentDto | null>(null)
+const deleteLoading = ref(false)
+
+function askDelete(dept: DepartmentDto) {
+  deleteTarget.value = dept
+  showDeleteConfirm.value = true
+}
+
+async function handleDelete() {
+  if (!deleteTarget.value) return
   try {
-    await deleteDepartment(id)
+    deleteLoading.value = true
+    await deleteDepartment(deleteTarget.value.id)
+    toast.success(`已删除科室「${deleteTarget.value.name}」`)
     await loadDepartments()
   } catch (error) {
-    alert(error instanceof Error ? error.message : '删除失败')
+    toast.error(error instanceof Error ? error.message : '删除失败')
+  } finally {
+    deleteLoading.value = false
+    showDeleteConfirm.value = false
   }
 }
 
@@ -153,7 +184,7 @@ function cancelForm() {
                   <Button variant="ghost" size="icon" @click="openEditForm(dept)">
                     <Edit class="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" @click="handleDelete(dept.id)">
+                  <Button variant="ghost" size="icon" @click="askDelete(dept)">
                     <Trash2 class="h-4 w-4" />
                   </Button>
                 </div>
@@ -163,5 +194,21 @@ function cancelForm() {
         </Table>
       </CardContent>
     </Card>
+
+    <!-- 删除确认 -->
+    <AlertDialog v-model:open="showDeleteConfirm">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>确定要删除该科室吗？</AlertDialogTitle>
+          <AlertDialogDescription>
+            将删除科室「{{ deleteTarget?.name }}」，该操作不可恢复。
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel :disabled="deleteLoading">取消</AlertDialogCancel>
+          <AlertDialogAction :disabled="deleteLoading" @click="handleDelete">删除</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>

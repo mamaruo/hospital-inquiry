@@ -54,7 +54,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setRole(Role.ADMIN);
             admin.setEnabled(true);
             userRepository.save(admin);
-            System.out.println("已创建管理员账号: admin / admin123");
+            System.out.println("已创建管理员账号: " + adminMobile + " / admin");
         } else {
             System.out.println("管理员账号已存在");
         }

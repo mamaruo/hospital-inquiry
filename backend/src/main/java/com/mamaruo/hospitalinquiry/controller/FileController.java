@@ -39,18 +39,18 @@ public class FileController {
 
     // 获取医生头像
     @GetMapping("/{doctorId}/photo")
-    public ResponseEntity<byte[]> getDoctorPhoto(@PathVariable Integer doctorId) throws IOException {
+    public ResponseEntity<byte[]> getDoctorPhoto(@PathVariable Integer doctorId) {
         DoctorProfile doctor = doctorProfileRepository.findById(doctorId)
                 .orElseThrow(() -> new IllegalArgumentException("医生不存在"));
-        
+
         if (doctor.getPhotoPath() == null) {
             return ResponseEntity.notFound().build();
         }
 
-        byte[] data = fileService.getDoctorPhoto(doctor.getPhotoPath());
+        FileService.DoctorPhoto photo = fileService.getDoctorPhoto(doctor.getPhotoPath());
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(data);
+                .contentType(determineMediaType(photo.filename()))
+                .body(photo.data());
     }
 
     private MediaType determineMediaType(String filename) {
@@ -61,6 +61,8 @@ public class FileController {
             return MediaType.IMAGE_GIF;
         } else if (lower.endsWith(".webp")) {
             return MediaType.valueOf("image/webp");
+        } else if (lower.endsWith(".svg")) {
+            return MediaType.valueOf("image/svg+xml");
         }
         return MediaType.IMAGE_JPEG;
     }

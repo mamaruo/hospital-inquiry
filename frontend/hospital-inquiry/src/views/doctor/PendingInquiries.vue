@@ -6,6 +6,7 @@ import type { InquiryDto } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Check, MessageSquare } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 const router = useRouter()
 const inquiries = ref<InquiryDto[]>([])
@@ -31,7 +32,7 @@ async function handleAccept(inquiry: InquiryDto) {
     await acceptInquiry(inquiry.id)
     router.push(`/doctor/chat/${inquiry.id}`)
   } catch (error) {
-    alert(error instanceof Error ? error.message : '接受问诊失败')
+    toast.error(error instanceof Error ? error.message : '接受问诊失败')
   }
 }
 
