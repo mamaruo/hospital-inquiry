@@ -30,3 +30,5 @@ replay_pid*
 
 # 大模型参考资料
 /ref
+# git worktrees
+.worktrees/
