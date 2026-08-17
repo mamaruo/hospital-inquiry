@@ -39,8 +39,11 @@ export const useWebSocketStore = defineStore('websocket', () => {
     }
 
     status.value = 'connecting'
+    // 仅在切换问诊房间时清空消息，避免清掉刚写入的历史消息
+    if (currentInquiryId.value !== inquiryId) {
+      messages.value = []
+    }
     currentInquiryId.value = inquiryId
-    messages.value = []
     error.value = null
 
     const wsUrl = `${WS_BASE_URL}/ws/chat?token=${token}&inquiryId=${inquiryId}`

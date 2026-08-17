@@ -80,12 +80,12 @@ onMounted(async () => {
     // 加载问诊信息
     inquiry.value = await getInquiryById(inquiryId.value)
 
+    // 连接 WebSocket（先连接，历史消息随后写入，避免被连接逻辑清空）
+    wsStore.connect(inquiryId.value)
+
     // 加载历史消息
     const messages = await getMessagesByInquiry(inquiryId.value)
     wsStore.setInitialMessages(messages)
-
-    // 连接 WebSocket
-    wsStore.connect(inquiryId.value)
   } catch (error) {
     console.error('加载问诊信息失败:', error)
     toast.error('问诊不存在或无权访问')
