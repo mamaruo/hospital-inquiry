@@ -1,15 +1,35 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth'
 import { useWebSocketStore } from '@/stores/websocket'
-import { getInquiryById, getMessagesByInquiry, acceptInquiry, completeInquiry, uploadFile } from '@/lib/api'
-import type { InquiryDto } from '@/lib/api'
+import {
+  getInquiryById,
+  getMessagesByInquiry,
+  acceptInquiry,
+  completeInquiry,
+  uploadFile,
+  API_BASE_URL,
+} from '@/lib/api'
+import type { InquiryDto, MessageDto } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Marker, MarkerContent } from '@/components/ui/marker'
+import { Message, MessageAvatar, MessageContent, MessageHeader } from '@/components/ui/message'
+import { Bubble, BubbleContent } from '@/components/ui/bubble'
+import { AttachmentMedia } from '@/components/ui/attachment'
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from '@/components/ui/message-scroller'
 import { ArrowLeft, Send, Image as ImageIcon, Check, X } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -20,8 +40,9 @@ const wsStore = useWebSocketStore()
 const inquiry = ref<InquiryDto | null>(null)
 const loading = ref(true)
 const inputMessage = ref('')
-const messagesContainer = ref<HTMLElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
+const confirmingComplete = ref(false)
+let confirmCompleteTimer: ReturnType<typeof setTimeout> | null = null
 
 const inquiryId = computed(() => parseInt(route.params.id as string))
 const isDoctor = computed(() => authStore.isDoctor)
@@ -35,22 +56,39 @@ const statusMap: Record<string, { label: string; variant: 'default' | 'secondary
   COMPLETED: { label: '已结束', variant: 'outline' },
 }
 
+// 渲染项：按日期插入 Marker 分隔，其后为消息
+type RenderItem =
+  | { kind: 'marker'; key: string; label: string }
+  | { kind: 'message'; key: string; message: MessageDto }
+
+const renderItems = computed<RenderItem[]>(() => {
+  const items: RenderItem[] = []
+  let lastDate = ''
+  for (const message of wsStore.messages) {
+    const date = message.created_at.slice(0, 10)
+    if (date !== lastDate) {
+      lastDate = date
+      items.push({ kind: 'marker', key: `marker-${message.id}`, label: formatDateLabel(message.created_at) })
+    }
+    items.push({ kind: 'message', key: `message-${message.id}`, message })
+  }
+  return items
+})
+
 onMounted(async () => {
   try {
     // 加载问诊信息
     inquiry.value = await getInquiryById(inquiryId.value)
-    
+
     // 加载历史消息
     const messages = await getMessagesByInquiry(inquiryId.value)
     wsStore.setInitialMessages(messages)
-    
+
     // 连接 WebSocket
     wsStore.connect(inquiryId.value)
-    
-    scrollToBottom()
   } catch (error) {
     console.error('加载问诊信息失败:', error)
-    alert('问诊不存在或无权访问')
+    toast.error('问诊不存在或无权访问')
     goBack()
   } finally {
     loading.value = false
@@ -58,22 +96,13 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  if (confirmCompleteTimer) clearTimeout(confirmCompleteTimer)
   wsStore.disconnect()
 })
 
-watch(() => wsStore.messages.length, () => {
-  nextTick(scrollToBottom)
-})
-
-function scrollToBottom() {
-  if (messagesContainer.value) {
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-  }
-}
-
 function sendMessage() {
   if (!inputMessage.value.trim() || !canChat.value) return
-  
+
   wsStore.sendMessage(inputMessage.value.trim(), 'TEXT')
   inputMessage.value = ''
 }
@@ -94,13 +123,16 @@ async function handleFileChange(e: Event) {
   const file = target.files?.[0]
   if (!file) return
 
+  const toastId = toast.loading('图片上传中...')
   try {
     const result = await uploadFile(file)
     wsStore.sendMessage(result.url, 'IMAGE')
+    toast.success('图片已发送', { id: toastId })
   } catch (error) {
-    alert('图片上传失败')
+    console.error('图片上传失败:', error)
+    toast.error('图片上传失败', { id: toastId })
   }
-  
+
   target.value = ''
 }
 
@@ -108,17 +140,36 @@ async function handleAccept() {
   if (!inquiry.value) return
   try {
     inquiry.value = await acceptInquiry(inquiry.value.id)
+    toast.success('已接受问诊')
   } catch (error) {
-    alert(error instanceof Error ? error.message : '接受问诊失败')
+    toast.error(error instanceof Error ? error.message : '接受问诊失败')
   }
 }
 
-async function handleComplete() {
-  if (!inquiry.value || !confirm('确定要结束本次问诊吗？')) return
+// 两步确认：第一次点击进入确认态，3 秒内再次点击才真正结束
+function handleComplete() {
+  if (!inquiry.value) return
+  if (!confirmingComplete.value) {
+    confirmingComplete.value = true
+    toast.info('请再次点击按钮确认结束问诊', { duration: 3000 })
+    if (confirmCompleteTimer) clearTimeout(confirmCompleteTimer)
+    confirmCompleteTimer = setTimeout(() => {
+      confirmingComplete.value = false
+    }, 3000)
+    return
+  }
+  if (confirmCompleteTimer) clearTimeout(confirmCompleteTimer)
+  confirmingComplete.value = false
+  doComplete()
+}
+
+async function doComplete() {
+  if (!inquiry.value) return
   try {
     inquiry.value = await completeInquiry(inquiry.value.id)
+    toast.success('问诊已结束')
   } catch (error) {
-    alert(error instanceof Error ? error.message : '结束问诊失败')
+    toast.error(error instanceof Error ? error.message : '结束问诊失败')
   }
 }
 
@@ -130,16 +181,39 @@ function goBack() {
   }
 }
 
+function resolveMediaUrl(url: string) {
+  return url.startsWith('http') ? url : `${API_BASE_URL}${url}`
+}
+
 function openImage(url: string) {
-  window.open(url, '_blank')
+  window.open(resolveMediaUrl(url), '_blank')
+}
+
+function isMine(message: MessageDto) {
+  return message.sender_id === currentUserId.value
+}
+
+// 医生侧有头像时显示头像图片，否则用首字兜底
+function senderAvatarUrl(message: MessageDto) {
+  const photoUrl = inquiry.value?.doctor.photo_url
+  if (message.sender_role === 'DOCTOR' && photoUrl) {
+    return resolveMediaUrl(photoUrl)
+  }
+  return null
 }
 
 function formatTime(dateStr: string) {
   return new Date(dateStr).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
 }
 
-function isImageUrl(content: string) {
-  return content.startsWith('/api/files/') || content.startsWith('http')
+function formatDateLabel(dateStr: string) {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+  const diffDays = Math.round((startOfDay(now) - startOfDay(date)) / 86400000)
+  if (diffDays === 0) return '今天'
+  if (diffDays === 1) return '昨天'
+  return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 </script>
 
@@ -165,16 +239,21 @@ function isImageUrl(content: string) {
           </p>
         </div>
       </div>
-      
+
       <!-- 医生操作按钮 -->
       <div v-if="isDoctor && inquiry" class="flex gap-2">
         <Button v-if="isPending" @click="handleAccept" size="sm">
           <Check class="mr-2 h-4 w-4" />
           接受问诊
         </Button>
-        <Button v-if="canChat" variant="outline" size="sm" @click="handleComplete">
-          <X class="mr-2 h-4 w-4" />
-          结束问诊
+        <Button
+          v-if="canChat"
+          :variant="confirmingComplete ? 'destructive' : 'outline'"
+          size="sm"
+          @click="handleComplete"
+        >
+          <X v-if="!confirmingComplete" class="mr-2 h-4 w-4" />
+          {{ confirmingComplete ? '确认结束问诊' : '结束问诊' }}
         </Button>
       </div>
     </div>
@@ -194,51 +273,66 @@ function isImageUrl(content: string) {
     </Card>
 
     <!-- 消息列表 -->
-    <div ref="messagesContainer" class="flex-1 overflow-y-auto space-y-4 py-4">
-      <div v-if="loading" class="text-center text-muted-foreground">
-        加载中...
-      </div>
-      
-      <div v-else-if="wsStore.messages.length === 0" class="text-center text-muted-foreground py-8">
-        暂无消息，{{ canChat ? '开始聊天吧' : '等待医生接诊' }}
-      </div>
+    <MessageScrollerProvider auto-scroll default-scroll-position="end">
+      <MessageScroller class="min-h-0 flex-1">
+        <MessageScrollerViewport>
+          <MessageScrollerContent class="gap-4 py-4 pe-1">
+            <div v-if="loading" class="text-center text-muted-foreground">
+              加载中...
+            </div>
 
-      <div
-        v-else
-        v-for="message in wsStore.messages"
-        :key="message.id"
-        :class="[
-          'flex gap-3',
-          message.sender_id === currentUserId ? 'flex-row-reverse' : ''
-        ]"
-      >
-        <Avatar class="h-8 w-8 shrink-0">
-          <AvatarFallback>{{ message.sender_name?.charAt(0) || '?' }}</AvatarFallback>
-        </Avatar>
-        <div :class="['max-w-[70%]', message.sender_id === currentUserId ? 'items-end' : 'items-start']">
-          <div class="flex items-center gap-2 mb-1" :class="message.sender_id === currentUserId ? 'flex-row-reverse' : ''">
-            <span class="text-xs font-medium">{{ message.sender_name }}</span>
-            <span class="text-xs text-muted-foreground">{{ formatTime(message.created_at) }}</span>
-          </div>
-          <div
-            :class="[
-              'rounded-lg px-3 py-2',
-              message.sender_id === currentUserId
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted'
-            ]"
-          >
-            <img
-              v-if="message.type === 'IMAGE'"
-              :src="isImageUrl(message.content) ? (message.content.startsWith('http') ? message.content : `http://localhost:8081/hi${message.content}`) : message.content"
-              class="max-w-full rounded cursor-pointer"
-              @click="openImage(message.content)"
-            />
-            <p v-else class="whitespace-pre-wrap break-words">{{ message.content }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+            <div v-else-if="wsStore.messages.length === 0" class="flex min-h-32 items-center justify-center text-muted-foreground">
+              暂无消息，{{ canChat ? '开始聊天吧' : '等待医生接诊' }}
+            </div>
+
+            <template v-else>
+              <template v-for="item in renderItems" :key="item.key">
+                <Marker v-if="item.kind === 'marker'" variant="separator" class="text-xs">
+                  <MarkerContent>{{ item.label }}</MarkerContent>
+                </Marker>
+
+                <MessageScrollerItem v-else :message-id="String(item.message.id)">
+                  <Message :align="isMine(item.message) ? 'end' : 'start'">
+                    <MessageAvatar>
+                      <Avatar class="size-8">
+                        <AvatarImage v-if="senderAvatarUrl(item.message)" :src="senderAvatarUrl(item.message)!" />
+                        <AvatarFallback>{{ item.message.sender_name?.charAt(0) || '?' }}</AvatarFallback>
+                      </Avatar>
+                    </MessageAvatar>
+                    <MessageContent>
+                      <MessageHeader class="gap-1.5">
+                        <span>{{ item.message.sender_name }}</span>
+                        <span class="text-muted-foreground/70">{{ formatTime(item.message.created_at) }}</span>
+                      </MessageHeader>
+                      <Bubble
+                        :variant="isMine(item.message) ? 'default' : 'secondary'"
+                        :align="isMine(item.message) ? 'end' : 'start'"
+                      >
+                        <!-- 图片消息 -->
+                        <BubbleContent v-if="item.message.type === 'IMAGE'" class="p-1">
+                          <AttachmentMedia
+                            variant="image"
+                            class="w-56 cursor-pointer"
+                            @click="openImage(item.message.content)"
+                          >
+                            <img :src="resolveMediaUrl(item.message.content)" :alt="item.message.sender_name" />
+                          </AttachmentMedia>
+                        </BubbleContent>
+                        <!-- 文字消息 -->
+                        <BubbleContent v-else class="whitespace-pre-wrap">
+                          {{ item.message.content }}
+                        </BubbleContent>
+                      </Bubble>
+                    </MessageContent>
+                  </Message>
+                </MessageScrollerItem>
+              </template>
+            </template>
+          </MessageScrollerContent>
+        </MessageScrollerViewport>
+        <MessageScrollerButton />
+      </MessageScroller>
+    </MessageScrollerProvider>
 
     <!-- 输入框 -->
     <div class="pt-4 border-t">
