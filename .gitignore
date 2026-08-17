@@ -32,3 +32,6 @@ replay_pid*
 /ref
 # git worktrees
 .worktrees/
+
+# ZCode 本地配置
+.zcode/
